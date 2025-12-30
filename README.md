@@ -54,7 +54,7 @@ After those first two steps, the following steps are needed, either by using `us
 Creating and starting a timer to execute a script named `task.sh` can be done in one command.
 
 ```bash
-usertimers add --desc "Execute task" --exec ~/.local/bin/task.sh --when weekly --exec-if-missed
+usertimers add --desc "Execute task" --exec ~/.local/bin/task.sh --schedule weekly --exec-if-missed
 ```
 
 By default, the timer name is set to the executable name without its file extension (`task` in this example). The timer name can be set explicitly by adding a `--name <task_name>` parameter.
