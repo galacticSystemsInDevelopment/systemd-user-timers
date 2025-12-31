@@ -1,3 +1,7 @@
+mod command_add;
+
+use crate::command_add::add_timer;
+
 use clap::{Command, arg, command, value_parser};
 
 fn main() {
@@ -26,28 +30,7 @@ fn main() {
         ).get_matches();
 
     if let Some(add_matches) = matches.subcommand_matches("add") {
-        println!(
-            "Add subcommand exec-if-missed value: {}",
-            add_matches.get_flag("exec-if-missed")
-        );
-
-        // Retrieving the other arguments safely, using .value_of
-        if let Some(executable) = add_matches.get_one::<String>("exec") {
-            println!("Executable: {}", executable);
-        }
-        
-        if let Some(description) = add_matches.get_one::<String>("desc") {
-            println!("Description: {}", description);
-        }
-        
-        if let Some(schedule) = add_matches.get_one::<String>("sche
-        ") {
-            println!("Schedule: {}", schedule);
-        }
-        
-        if let Some(name) = add_matches.get_one::<String>("name") {
-            println!("Name: {}", name);
-        }
+        add_timer(add_matches);
     } else {
         println!("No subcommand");
     }
