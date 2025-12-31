@@ -18,21 +18,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 Here is how to install systemd-user-timers:
 ```bash
-cargo install systemd-user-t  -e, --exec <EXECUTABLE>     The executable the timer will run
-  -m, --exec-if-missed        Execute immediately if missed
-  -d, --desc <DESCRIPTION>    A description of the timer
-  -s, --schedule <SCHEDULE>   The schedule for the timer
-  -n, --name <NAME>           Optional: The name for the timer
-      --recurring             Whether the timer is recurring
-      --on-calendar           Use OnCalendar= (systemd calendar schedule) instead of OnActiveSec/OnUnitActiveSec
-      --from-boot             Make schedule relative to system boot (OnBootSec=)
-      --single-use            Whether the timer is single-use
-      --enable-at-login       Enable the timer for the user at login
-      --start-after-create    Start the timer immediately after creating it
-      --service <SERVICE>     Specify service unit name to create/use
-      --already-made-service  Assume the service already exists; do not write a service file
-      --normal-service        Whether the timer activates a normal service instead of a one-shot
-  -h, --helpimers
+cargo install systemd-user-timers
 ```
 
 ## Subcommands
