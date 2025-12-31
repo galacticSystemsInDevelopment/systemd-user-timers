@@ -19,7 +19,7 @@ journalctl --user TIMER       # display log of a timer
 ```
 
 ## Installation
-Currently, there is no package for this, so you need to install it manually. You can do so by using the dev container inside Visual Studio Code (needs Dev Containers extension and Docker installed). If you don't want to use the container, you have to have the Rust toolchain installed. To install the rust toolchain, type in this:
+Currently, there is no package for this, so you need to install it manually. You can do so by using the dev container inside Visual Studio Code (needs Dev Containers extension and Docker installed). If you don't want to use the container, you have to have the Rust toolchain installed. To install the Rust toolchain, type in this:
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
@@ -34,7 +34,7 @@ Run:
 cargo run <ARGS>
 ```
 
-Run the executable without cargo:
+Run the executable without Cargo:
 ```bash
 ./target/debug/usertimers <ARGS>
 
@@ -50,7 +50,7 @@ Run as release:
 cargo run --release <ARGS>
 ```
 
-Run as release without cargo:
+Run as release without Cargo:
 ```bash
 ./target/release/usertimers <ARGS>
 ```
@@ -61,7 +61,7 @@ cargo install --path
 ```
 
 Run after install:
-``bash
+```bash
 usertimers <ARGS>
 ```
 **Note**: <ARGS> is a placeholder for the arguments that you type in these commands.
