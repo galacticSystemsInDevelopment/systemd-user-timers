@@ -1,4 +1,5 @@
 mod command_add;
+mod timers;
 
 use crate::command_add::add_timer;
 
@@ -24,8 +25,16 @@ fn main() {
                         .action(clap::ArgAction::SetTrue),
                     arg!(--"single-use" "Whether the timer is single-use")
                         .action(clap::ArgAction::SetTrue),
+                    arg!(--"enable-at-login" "Enable the timer for the user at login")
+                        .action(clap::ArgAction::SetTrue),
+                    arg!(--"start-after-create" "Start the timer immediately after creating it")
+                        .action(clap::ArgAction::SetTrue),
+                    arg!(--service <SERVICE> "Specify service unit name to create/use")
+                        .value_parser(value_parser!(String)),
+                    arg!(--"already-made-service" "Assume the service already exists; do not write a service file")
+                        .action(clap::ArgAction::SetTrue),
                     arg!(--"normal-service" "Whether the timer activates a normal service instead of a one-shot")
-                        .action(clap::ArgAction::SetTrue)
+                        .action(clap::ArgAction::SetTrue),
                 ])
         ).get_matches();
 
