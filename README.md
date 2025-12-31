@@ -53,7 +53,7 @@ Run as release without cargo:
 **Note**: Our GitHub repository does not include the "target" folder, and we don't have cross-compile tools, and you can build it yourself.
 
 ## Contributing packages
-View this page: https://github.com/galacticSystemsInDevelopment/systemd-user-timers/tree/packages
+View this page: https://github.com/galacticSystemsInDevelopment/systemd-user-timers-packages/
 
 ## Functionality (subcommands)
 
