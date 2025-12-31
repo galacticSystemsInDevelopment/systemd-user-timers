@@ -1,6 +1,7 @@
-mod command_add;
+mod extract_arg_contents_add;
+mod write_to_file;
 mod timers;
-use crate::command_add::add_timer;
+use crate::extract_arg_contents_add::add_timer;
 
 use clap::{Command, arg, command, value_parser};
 
@@ -105,9 +106,6 @@ fn main() {
                     arg!(<name> "The name of the timer to disable")
                         .value_parser(value_parser!(String)),
                 ])
-        ).subcommand(
-            Command::new("help")
-                .about("Show help information")
         ).get_matches();
 
     if let Some(add_matches) = matches.subcommand_matches("add") {
@@ -195,10 +193,7 @@ fn main() {
         println!("Disabling timer: {}", name);
         let timer_unit = format!("{}.timer", name);
         let _ = std::process::Command::new("systemctl").args(&["--user", "disable", &timer_unit]).status();
-    } else if let Some(_help_matches) = matches.subcommand_matches("help") {
-        println!("Help information:");
-        println!("Help hasn't been implemented yet. Check README or use --help with specific commands.");
     } else {
         println!("No valid subcommand was used. Use --help for more information.");
     }
-}
+} 

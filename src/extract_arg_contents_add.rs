@@ -1,6 +1,7 @@
 use clap::ArgMatches;
 use crate::timers::Timer;
 
+
 pub fn add_timer(add_matches: &ArgMatches) {
 	// existing/new flags
 	let already_made_service = add_matches.get_flag("already-made-service");
@@ -99,5 +100,5 @@ pub fn add_timer(add_matches: &ArgMatches) {
 		start_after_create,
 	};
 
-	crate::timers::add_timer(timer);
+	crate::write_to_file::write(timer);
 }
