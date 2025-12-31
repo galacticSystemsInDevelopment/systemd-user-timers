@@ -41,11 +41,13 @@ pub fn add_timer(add_matches: &ArgMatches) {
 		});
 
 	let exec_if_missed = add_matches.get_flag("exec-if-missed");
-	let repeating = add_matches.get_flag("repeating");
 	let single_use = add_matches.get_flag("single-use");
 	let normal_service = add_matches.get_flag("normal-service");
 	let enable_at_login = add_matches.get_flag("enable-at-login");
 	let start_after_create = add_matches.get_flag("start-after-create");
+	let recurring = add_matches.get_flag("recurring") || add_matches.get_flag("repeating");
+	let on_calendar = add_matches.get_flag("on-calendar");
+	let from_boot = add_matches.get_flag("from-boot");
 
 	let timer = Timer {
 		name,
@@ -54,7 +56,9 @@ pub fn add_timer(add_matches: &ArgMatches) {
 		executable: exec_opt,
 		exec_if_missed,
 		single_use,
-		repeating,
+		recurring,
+		on_calendar,
+		from_boot,
 		normal_service,
 		service: service_name,
 		already_made_service,

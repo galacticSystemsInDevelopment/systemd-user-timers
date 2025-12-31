@@ -12,7 +12,9 @@ pub struct Timer {
     pub executable: Option<String>,
     pub exec_if_missed: bool,
     pub single_use: bool, // retained as the "promise"
-    pub repeating: bool,
+    pub recurring: bool,
+    pub on_calendar: bool,
+    pub from_boot: bool,
     pub normal_service: bool,
     pub service: Option<String>,
     pub already_made_service: bool,
@@ -40,13 +42,13 @@ pub fn add_timer(timer: Timer) {
         let esc = exe.replace('\'', "'\\''");
         let exec_start_line = format!("ExecStart=/bin/sh -c '{}'", esc);
 
-        // Service Type depends on repeating: simple if repeating, oneshot otherwise
-        let service_type_line = if timer.repeating {
+        // Service Type depends on recurring: simple if recurring, oneshot otherwise
+        let service_type_line = if timer.recurring {
             "Type=simple"
         } else {
             "Type=oneshot"
         };
-        let restart_line = if timer.repeating { "Restart=on-failure" } else { "Restart=no" };
+        let restart_line = if timer.recurring { "Restart=on-failure" } else { "Restart=no" };
 
         let mut svc = String::new();
         svc.push_str("[Unit]\n");
@@ -62,7 +64,11 @@ pub fn add_timer(timer: Timer) {
     };
 
     let persistent_line = if timer.exec_if_missed { "Persistent=yes" } else { "Persistent=no" };
-    let timer_trigger_line = if timer.repeating {
+    let timer_trigger_line = if timer.on_calendar {
+        format!("OnCalendar={}", timer.schedule)
+    } else if timer.from_boot {
+        format!("OnBootSec={}", timer.schedule)
+    } else if timer.recurring {
         format!("OnUnitActiveSec={}", timer.schedule)
     } else {
         format!("OnActiveSec={}", timer.schedule)
