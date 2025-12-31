@@ -21,9 +21,9 @@ fn main() {
                     arg!(--"single-use" "Whether the timer is single-use")
                         .action(clap::ArgAction::SetTrue),
                     arg!(--"normal-service" "Whether the timer activates a normal service instead of a one-shot")
-                        .action(clap::ArgAction::SetTrue),
-                ]),
-        .get_matches();
+                        .action(clap::ArgAction::SetTrue)
+                ])
+        ).get_matches();
 
     if let Some(add_matches) = matches.subcommand_matches("add") {
         println!(
