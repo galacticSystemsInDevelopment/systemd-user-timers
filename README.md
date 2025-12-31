@@ -27,7 +27,7 @@ cargo build
 
 Run:
 ```bash
-cargo run
+cargo run <ARGS>
 ```
 
 Run the executable without cargo:
@@ -43,13 +43,25 @@ cargo build --release
 
 Run as release:
 ```bash
-cargo run --release
+cargo run --release <ARGS>
 ```
 
 Run as release without cargo:
 ```bash
 ./target/
 ```
+
+Install (release):
+```bash
+cargo install --path
+```
+
+Run after install:
+``bash
+usertimers <ARGS>
+```
+**Note**: <ARGS> is a placeholder for the arguments that you type in these commands.
+
 **Note**: Our GitHub repository does not include the "target" folder, and we don't have cross-compile tools, and you can build it yourself.
 
 ## Contributing packages
