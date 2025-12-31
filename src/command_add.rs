@@ -28,16 +28,49 @@ pub fn add_timer(add_matches: &ArgMatches) {
 		});
 
 	// optional
-	let description = add_matches.get_one::<String>("desc").map(|s| s.to_string());
+	let description = add_matches
+		.get_one::<String>("desc")
+		.map(|s| s.to_string())
+		.or_else(|| {
+			if already_made_service {
+				service_name.as_ref().map(|s| {
+					let svc = if s.ends_with(".service") {
+						s.trim_end_matches(".service")
+					} else {
+						s.as_str()
+					};
+					format!("Run {}", svc)
+				})
+			} else {
+				exec_opt.as_ref().map(|s| {
+					let exe = std::path::Path::new(s)
+						.file_name()
+						.and_then(|os| os.to_str())
+						.unwrap_or(s.as_str());
+					format!("Run {}", exe)
+				})
+			}
+		});
+
 	let name = add_matches
 		.get_one::<String>("name")
 		.map(|s| s.to_string())
 		.unwrap_or_else(|| {
-			std::path::Path::new(&exec_opt.as_ref().unwrap_or(&"".to_string()))
-				.file_stem()
-				.and_then(|s| s.to_str())
-				.map(|s| s.to_string())
-				.unwrap_or_else(|| schedule.replace(|c: char| !c.is_ascii_alphanumeric(), "_"))
+			if already_made_service {
+				if let Some(svc) = service_name.as_ref() {
+					if svc.ends_with(".service") {
+						return svc.trim_end_matches(".service").to_string();
+					} else {
+						return svc.clone();
+					}
+				}
+			}
+			if let Some(exec) = exec_opt.as_ref() {
+				if let Some(stem) = std::path::Path::new(exec).file_stem().and_then(|os| os.to_str()) {
+					return stem.to_string();
+				}
+			}
+			schedule.replace(|c: char| !c.is_ascii_alphanumeric(), "_")
 		});
 
 	let exec_if_missed = add_matches.get_flag("exec-if-missed");

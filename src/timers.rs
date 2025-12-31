@@ -42,13 +42,13 @@ pub fn add_timer(timer: Timer) {
         let esc = exe.replace('\'', "'\\''");
         let exec_start_line = format!("ExecStart=/bin/sh -c '{}'", esc);
 
-        // Service Type depends on recurring: simple if recurring, oneshot otherwise
-        let service_type_line = if timer.recurring {
+        // Service Type depends on normal_service: simple if normal_service, oneshot otherwise
+        let service_type_line = if timer.normal_service {
             "Type=simple"
         } else {
             "Type=oneshot"
         };
-        let restart_line = if timer.recurring { "Restart=on-failure" } else { "Restart=no" };
+        let restart_line = if timer.normal_service { "Restart=on-failure" } else { "Restart=no" };
 
         let mut svc = String::new();
         svc.push_str("[Unit]\n");
