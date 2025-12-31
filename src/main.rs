@@ -5,8 +5,7 @@ use crate::command_add::add_timer;
 use clap::{Command, arg, command, value_parser};
 
 fn main() {
-    let matches = {
-        let this = command!()
+    let matches = command!()
         .subcommand(
             Command::new("add")
                 .about("Add a timer")
@@ -83,8 +82,15 @@ fn main() {
                         .value_parser(value_parser!(String)),
                 ])
         ).subcommand(
-            Command::new("reload-daemon")
-                .about("Reload the systemd user daemon")
+            Command::new("status")
+                .about("Show status of a timer")
+                .args([
+                    arg!(<name> "The name of the timer to show status for")
+                        .value_parser(value_parser!(String)),
+                ])
+        ).subcommand(
+            Command::new("reload")
+                .about("Reload systemd user daemon")
         ).subcommand(
             Command::new("enable")
                 .about("Enable a timer")
@@ -100,17 +106,9 @@ fn main() {
                         .value_parser(value_parser!(String)),
                 ])
         ).subcommand(
-            Command::new("status")
-                .about("Get the status of a timer")
-                .args([
-                    arg!(<name> "The name of the timer to get status for")
-                        .value_parser(value_parser!(String)),
-                ])
-        ).subcommand(
             Command::new("help")
-                .about("Print help information")
+                .about("Show help information")
         ).get_matches();
-    };
 
     if let Some(add_matches) = matches.subcommand_matches("add") {
         add_timer(add_matches);
@@ -119,47 +117,43 @@ fn main() {
             .get_one::<String>("name")
             .expect("required argument");
         println!("Removing timer: {}", name);
-        // reload using the user systemd instance
+            // reload using the user systemd instance
         let timer_unit = format!("{}.timer", name);
         let _ = std::process::Command::new("systemctl").args(&["--user", "stop", &timer_unit]).status();
         let _ = std::process::Command::new("systemctl").args(&["--user", "disable", &timer_unit]).status();
 
-        // Use HOME to build the user units path
+        // Use HOME to build the user units path and remove files directly
         let home = std::env::var("HOME").unwrap_or_else(|_| "~".to_string());
         let timer_path = format!("{}/.config/systemd/user/{}.timer", home, name);
-
-        // Read the timer file first to resolve the Unit= value (if present)
-        let resolved_service = match std::fs::read_to_string(&timer_path) {
-            Ok(contents) => contents.lines()
-                .map(|l| l.trim())
-                .filter(|l| !l.starts_with('#') && !l.starts_with(';'))
-                .find_map(|l| {
-                    if let Some(rest) = l.strip_prefix("Unit=") {
-                        // Remove inline comments after the value and trim
-                        let val = rest.split(|c| c == '#' || c == ';').next().unwrap_or("").trim();
-                        if val.is_empty() { None } else { Some(val.to_string()) }
-                    } else {
-                        None
-                    }
-                })
-                .unwrap_or_else(|| format!("{}.service", name)),
-            Err(_) => format!("{}.service", name),
-        };
-
-        // Remove timer file
         let _ = std::fs::remove_file(&timer_path);
 
+        let _ = std::process::Command::new("systemctl").args(&["--user", "daemon-reload"]).status();
         if remove_matches.get_flag("remove-service") {
-            // Stop/disable the resolved service, then remove its unit file
+            // Try to read the timer file and extract Unit= value (if present).
+            // Fallback to "<name>.service" if not found or file unreadable.
+            let resolved_service = match std::fs::read_to_string(&timer_path) {
+                Ok(contents) => contents.lines()
+                    .map(|l| l.trim())
+                    .filter(|l| !l.starts_with('#') && !l.starts_with(';'))
+                    .find_map(|l| {
+                        if let Some(rest) = l.strip_prefix("Unit=") {
+                            // Remove inline comments after the value and trim
+                            let val = rest.split(|c| c == '#' || c == ';').next().unwrap_or("").trim();
+                            if val.is_empty() { None } else { Some(val.to_string()) }
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap_or_else(|| format!("{}.service", name)),
+                Err(_) => format!("{}.service", name),
+            };
+
             let _ = std::process::Command::new("systemctl").args(&["--user", "stop", &resolved_service]).status();
             let _ = std::process::Command::new("systemctl").args(&["--user", "disable", &resolved_service]).status();
 
             let service_path = format!("{}/.config/systemd/user/{}", home, resolved_service);
             let _ = std::fs::remove_file(&service_path);
         }
-
-        // Reload daemon after removals
-        let _ = std::process::Command::new("systemctl").args(&["--user", "daemon-reload"]).status();
     } else if let Some(_list_matches) = matches.subcommand_matches("list") {
         println!("Listing timers:");
         let _ = std::process::Command::new("systemctl").args(&["--user", "list-timers", "--all"]).status();
@@ -177,8 +171,14 @@ fn main() {
         println!("Stopping timer: {}", name);
         let timer_unit = format!("{}.timer", name);
         let _ = std::process::Command::new("systemctl").args(&["--user", "stop", &timer_unit]).status();
-        
-    } else if let Some(_reload_matches) = matches.subcommand_matches("reload-daemon") {
+    } else if let Some(_status_matches) = matches.subcommand_matches("status") {
+        let name = _status_matches
+            .get_one::<String>("name")
+            .expect("required argument");
+        println!("Showing status of timer: {}", name);
+        let timer_unit = format!("{}.timer", name);
+        let _ = std::process::Command::new("systemctl").args(&["--user", "show", &timer_unit]).status();
+    } else if let Some(_reload_matches) = matches.subcommand_matches("reload") {
         println!("Reloading systemd user daemon");
         let _ = std::process::Command::new("systemctl").args(&["--user", "daemon-reload"]).status();
     } else if let Some(_enable_matches) = matches.subcommand_matches("enable") {
@@ -195,12 +195,10 @@ fn main() {
         println!("Disabling timer: {}", name);
         let timer_unit = format!("{}.timer", name);
         let _ = std::process::Command::new("systemctl").args(&["--user", "disable", &timer_unit]).status();
-    } else if let Some(_status_matches) = matches.subcommand_matches("status") {
-        let name = _status_matches
-            .get_one::<String>("name")
-            .expect("required argument");
-        println!("Status of timer: {}", name);
-        let timer_unit = format!("{}.timer", name);
-        let _ = std::process::Command::new("systemctl").args(&["--user", "status", &timer_unit]).status();
+    } else if let Some(_help_matches) = matches.subcommand_matches("help") {
+        println!("Help information:");
+        println!("Help hasn't been implemented yet. Check README or use --help with specific commands.");
+    } else {
+        println!("No valid subcommand was used. Use --help for more information.");
     }
 }
