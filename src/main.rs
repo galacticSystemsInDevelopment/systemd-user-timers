@@ -156,7 +156,7 @@ fn main() {
         }
     } else if let Some(_list_matches) = matches.subcommand_matches("list") {
         println!("Listing timers:");
-        let _ = std::process::Command::new("systemctl").args(&["--user", "list-timers", "--all"]).status();
+        let _ = std::process::Command::new("systemctl").args(&["--user", "list-unit-files", "--type=timer"]).status();
     } else if let Some(_start_matches) = matches.subcommand_matches("start") {
         let name = _start_matches
             .get_one::<String>("name")
