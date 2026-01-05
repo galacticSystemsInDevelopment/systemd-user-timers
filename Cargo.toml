@@ -1,6 +1,6 @@
 [package]
 name = "systemd-user-timers"
-version = "1.0.7"
+version = "2026.1.5"
 edition = "2024"
 description = "A simple way to make systemd user timers, and might grow up into a full simple systemd frontend"
 repository = "https://github.com/galacticSystemsInDevelopment/systemd-user-timers"
