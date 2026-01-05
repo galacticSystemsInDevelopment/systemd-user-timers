@@ -1,10 +1,12 @@
 [package]
 name = "systemd-user-timers"
-version = "1.0.9"
+version = "1.0.10"
 edition = "2024"
 description = "A simple way to make systemd user timers, and might grow up into a full simple systemd frontend"
 repository = "https://github.com/galacticSystemsInDevelopment/systemd-user-timers"
 license = "MIT"
+homepage = "https://systemd-user-timers.galacticsystemsindevelopment.xyz"
+
 
 [[bin]]
 name = "usertimers"  # This changes the name of the executable
