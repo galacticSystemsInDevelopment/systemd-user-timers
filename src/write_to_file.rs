@@ -10,6 +10,12 @@ pub fn write(timer: Timer) {
 
     println!("Adding timer: {:?}", timer);
 
+    let remain_line = if timer.recurring {
+        "RemainAfterElapse=yes"
+    } else {
+        "RemainAfterElapse=no" // Or omit to use default
+    };
+
     let description_line = if let Some(ref desc) = timer.description {
         format!("Description={}", desc)
     } else {
@@ -59,8 +65,8 @@ pub fn write(timer: Timer) {
 
     // timer references the chosen service unit name
     let timer_contents = format!(
-        "[Unit]\nDescription=Timer for {}\n\n[Timer]\nUnit={}.service\n{}\n{}\n\n[Install]\nWantedBy=timers.target\n",
-        timer.name, service_unit_name, timer_trigger_line, persistent_line
+        "[Unit]\nDescription=Timer for {}\n\n[Timer]\nUnit={}.service\n{}\n{}\n{}\n\n[Install]\nWantedBy=timers.target\n",
+        timer.name, service_unit_name, timer_trigger_line, persistent_line, remain_line
     );
 
     // determine user systemd unit directory:
