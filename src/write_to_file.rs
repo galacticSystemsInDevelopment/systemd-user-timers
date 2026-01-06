@@ -5,10 +5,10 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use crate::timers::Timer;
 
-pub fn write(timer: Timer) {
+pub fn write(timer: Timer) -> String {
     // Implementation to add the timer to the system
-
-    println!("Adding timer: {:?}", timer);
+    let mut log_output = String::new();
+    log_output.push_str(&format!("Adding timer: {:?}\n", timer));
 
     let remain_line = if timer.recurring {
         "RemainAfterElapse=yes"
@@ -82,8 +82,8 @@ pub fn write(timer: Timer) {
     };
 
     if let Err(e) = fs::create_dir_all(&unit_dir) {
-        println!("Failed to create user systemd unit dir {}: {}", unit_dir, e);
-        return;
+        log_output.push_str(&format!("Failed to create user systemd unit dir {}: {}", unit_dir, e));
+        return log_output;
     }
 
     // service unit filename is based on service_unit_name
@@ -93,13 +93,13 @@ pub fn write(timer: Timer) {
     // only write service file when we created it (not already-made)
     if let Some(svc) = service_contents_opt {
         if let Err(e) = fs::write(&service_path, svc) {
-            println!("Failed to write {}: {}", service_path, e);
-            return;
+            log_output.push_str(&format!("Failed to write {}: {}", service_path, e));
+            return log_output;
         }
     }
     if let Err(e) = fs::write(&timer_path, timer_contents) {
-        println!("Failed to write {}: {}", timer_path, e);
-        return;
+        log_output.push_str(&format!("Failed to write {}: {}", timer_path, e));
+        return log_output;
     }
 
     // record single-use promise by appending to .single_use.txt if requested
@@ -117,46 +117,49 @@ pub fn write(timer: Timer) {
         if !already {
             if let Ok(mut f) = OpenOptions::new().create(true).append(true).open(&su_path) {
                 if let Err(e) = writeln!(f, "{}", timer.name) {
-                    println!("Failed to write single-use promise {}: {}", su_path, e);
+                    log_output.push_str(&format!("Failed to write single-use promise {}: {}", su_path, e));
                 }
             } else {
-                println!("Failed to open {}", su_path);
+                log_output.push_str(&format!("Failed to open {}", su_path));
             }
         }
     }
 
     // reload using the user systemd instance
-    let _ = Command::new("systemctl").args(&["--user", "daemon-reload"]).status();
-
+    let reload_output = Command::new("systemctl").args(&["--user", "daemon-reload"]).status();
+    log_output.push_str(&format!("Reloading systemd user daemon: {:?}\n", reload_output));
     // enable/start logic controlled by flags:
     if timer.enable_at_login && timer.start_after_create {
         match Command::new("systemctl")
             .args(&["--user", "enable", "--now", &format!("{}.timer", timer.name)])
             .status()
         {
-            Ok(s) if s.success() => println!("Enabled and started {}.timer (user)", timer.name),
-            Ok(s) => println!("systemctl returned status {:?}", s.code()),
-            Err(e) => println!("Failed to enable/start timer: {}", e),
+            Ok(s) if s.success() => log_output.push_str(&format!("Enabled and started {}.timer (user)", timer.name)),
+            Ok(s) => log_output.push_str(&format!("systemctl returned status {:?}", s.code())),
+            Err(e) => log_output.push_str(&format!("Failed to enable/start timer: {}", e)),
         }
     } else if timer.enable_at_login {
         match Command::new("systemctl")
             .args(&["--user", "enable", &format!("{}.timer", timer.name)])
             .status()
         {
-            Ok(s) if s.success() => println!("Enabled {}.timer (user)", timer.name),
-            Ok(s) => println!("systemctl returned status {:?}", s.code()),
-            Err(e) => println!("Failed to enable timer: {}", e),
+            Ok(s) if s.success() => log_output.push_str(&format!("Enabled {}.timer (user)", timer.name)),
+            Ok(s) => log_output.push_str(&format!("systemctl returned status {:?}", s.code())),
+            Err(e) => log_output.push_str(&format!("Failed to enable timer: {}", e)),
         }
     } else if timer.start_after_create {
         match Command::new("systemctl")
             .args(&["--user", "start", &format!("{}.timer", timer.name)])
             .status()
         {
-            Ok(s) if s.success() => println!("Started {}.timer (user)", timer.name),
-            Ok(s) => println!("systemctl returned status {:?}", s.code()),
-            Err(e) => println!("Failed to start timer: {}", e),
+            Ok(s) if s.success() => {
+                log_output.push_str(&format!("Started {}.timer (user)", timer.name));
+            },
+            Ok(s) => log_output.push_str(&format!("systemctl returned status {:?}", s.code())),
+            Err(e) => log_output.push_str(&format!("Failed to start timer: {}", e)),
         }
     } else {
-        println!("Timer created but not enabled or started (flags not set).");
+        log_output.push_str("Timer created but not enabled or started (flags not set).");
     }
+    log_output
 }

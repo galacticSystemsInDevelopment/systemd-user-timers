@@ -100,5 +100,5 @@ pub fn add_timer(add_matches: &ArgMatches) {
 		start_after_create,
 	};
 
-	crate::write_to_file::write(timer);
+	println!("{}", crate::write_to_file::write(timer));
 }
