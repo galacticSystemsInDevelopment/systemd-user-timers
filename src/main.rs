@@ -14,6 +14,10 @@ mod command_stop;
 mod command_stop_lib;
 mod command_status;
 mod command_status_lib;
+mod command_enable;
+mod command_enable_lib;
+mod command_disable;
+mod command_disable_lib;
 
 fn main() {
     let matches = command!()
@@ -134,19 +138,9 @@ fn main() {
         println!("Reloading systemd user daemon");
         let _ = std::process::Command::new("systemctl").args(&["--user", "daemon-reload"]).status();
     } else if let Some(_enable_matches) = matches.subcommand_matches("enable") {
-        let name = _enable_matches
-            .get_one::<String>("name")
-            .expect("required argument");
-        println!("Enabling timer: {}", name);
-        let timer_unit = format!("{}.timer", name);
-        let _ = std::process::Command::new("systemctl").args(&["--user", "enable", &timer_unit]).status();
+        crate::command_enable::command_enable(_enable_matches);
     } else if let Some(_disable_matches) = matches.subcommand_matches("disable") {
-        let name = _disable_matches
-            .get_one::<String>("name")
-            .expect("required argument");
-        println!("Disabling timer: {}", name);
-        let timer_unit = format!("{}.timer", name);
-        let _ = std::process::Command::new("systemctl").args(&["--user", "disable", &timer_unit]).status();
+        crate::command_disable::command_disable(_disable_matches);
     } else {
         println!("No valid subcommand was used. Use --help for more information.");
     }
