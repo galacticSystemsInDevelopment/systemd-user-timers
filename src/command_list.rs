@@ -1,5 +1,5 @@
 pub fn list_timers() {
-    let output = crate::command_list_lib::list_timers().unwrap_or_else(|e| {
+    let output = systemd_user_timers_lib::list_timers::list_timers().unwrap_or_else(|e| {
         eprintln!("Error listing timers: {}", e);
         String::new()  // Returning an empty string on error
     });

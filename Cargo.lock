@@ -105,10 +105,17 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "systemd-user-timers"
-version = "1.0.14"
+version = "1.1.1"
 dependencies = [
  "clap",
+ "systemd-user-timers-lib",
 ]
+
+[[package]]
+name = "systemd-user-timers-lib"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "813ae90646feaec7f77132aab634186540dbe4ba75134b389f638d2b74f5bd71"
 
 [[package]]
 name = "utf8parse"

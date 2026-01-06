@@ -4,7 +4,7 @@ pub fn command_disable(_disable_matches: &clap::ArgMatches) {
         .get_one::<String>("name")
         .expect("required argument");
     
-    match crate::command_disable_lib::disable(name) {
+    match systemd_user_timers_lib::disable::disable(name) {
         Ok(_) => println!("Timer '{}' disabled successfully.", name),
         Err(e) => eprintln!("Error disabling timer '{}': {}", name, e),
     }

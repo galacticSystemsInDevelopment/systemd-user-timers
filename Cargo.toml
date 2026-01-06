@@ -1,6 +1,6 @@
 [package]
 name = "systemd-user-timers"
-version = "1.0.14"
+version = "1.1.1"
 edition = "2024"
 description = "A simple way to make systemd user timers, and might grow up into a full simple systemd frontend"
 repository = "https://github.com/galacticSystemsInDevelopment/systemd-user-timers"
@@ -14,3 +14,5 @@ path = "src/main.rs"         # The path to your Rust source code
 
 [dependencies]
 clap = { version = "4.5.54", features = ["cargo"] }
+systemd-user-timers-lib = "1.1.1"
+

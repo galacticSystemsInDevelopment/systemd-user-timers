@@ -1,23 +1,14 @@
 mod extract_arg_contents_add;
-mod write_to_file;
-mod timers;
 mod command_rm;
 mod command_list;
-mod command_list_lib;
 use crate::extract_arg_contents_add::add_timer;
 use crate::command_rm::remove_timer;
-mod command_rm_lib;
 use clap::{Command, arg, command, value_parser};
 mod command_start;
-mod command_start_lib;
 mod command_stop;
-mod command_stop_lib;
 mod command_status;
-mod command_status_lib;
 mod command_enable;
-mod command_enable_lib;
 mod command_disable;
-mod command_disable_lib;
 
 fn main() {
     let matches = command!()

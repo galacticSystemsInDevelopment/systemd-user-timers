@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use crate::timers::Timer;
+use systemd_user_timers_lib::timers::Timer;
 
 
 pub fn add_timer(add_matches: &ArgMatches) {
@@ -100,5 +100,5 @@ pub fn add_timer(add_matches: &ArgMatches) {
 		start_after_create,
 	};
 
-	println!("{}", crate::write_to_file::write(timer));
+	println!("{}", systemd_user_timers_lib::add_timer::add_timer(timer));
 }

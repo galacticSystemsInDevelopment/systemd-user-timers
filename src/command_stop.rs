@@ -3,5 +3,5 @@ pub fn command_stop(_stop_matches: &clap::ArgMatches) {
             .get_one::<String>("name")
             .expect("required argument");
     println!("Stopping timer: {}", name);
-    println!("{}", crate::command_stop_lib::command_stop(name).unwrap());
+    println!("{}", systemd_user_timers_lib::stop::stop(name).unwrap());
 }
